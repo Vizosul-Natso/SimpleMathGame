@@ -435,171 +435,160 @@
 
     <!-- script -->
 <script>
-    let gamepage = document.getElementById("game-page");
+
+let gamepage = document.getElementById("game-page");
 let easy = document.getElementById("easy-page");
 let countdown = document.getElementById("countdown");
 let startup = document.querySelector('.startup-page');
 const display = document.getElementById('timer');
 let bTime = document.getElementById('best-time');
 let bScore = document.getElementById('best-score');
-//changed
 const resultMessage = document.getElementById('result');
 const finalMessage = document.getElementById('final-msg');
+let flag = 0;
 
-// let easy = document.getElementById("game-page")
-
-let flag =0;
-
-function easyChoice(){
-    flag =0;
+function easyChoice() {
+    flag = 0;
     displayStartup();
 }
-function mediunChoice(){
-    flag =1;
+
+function mediunChoice() {
+    flag = 1;
     displayStartup()
 }
-function hardChoice(){
-    flag =2;
+
+function hardChoice() {
+    flag = 2;
     displayStartup()
 }
 
 let score = 0;
 let equationCount = 0;
 
-function resetGame(){
+function resetGame() {
     score = 0;
     equationCount = 0;
     resultMessage.textContent = " ";
-    finalMessage.textContent = " " ;
+    finalMessage.textContent = " ";
     resetTimer();
 }
-function playAgain(){
+
+function playAgain() {
     setTimeout(() => {
-        resetGame(); 
-    },100);
+        resetGame();
+    }, 100);
     setTimeout(() => {
         easy.style.display = "none";
-        displayCountdown(); 
-    },500);
-    
+        displayCountdown();
+    }, 500);
 }
 
 function startGame() {
     score = 0;
     equationCount = 0;
-    document.getElementById('score').textContent =  score;
+    document.getElementById('score').textContent = score;
     displayEquation();
-    startTimer();//changed
+    startTimer();
     displayTimer();
 }
 
-let bestScore = localStorage.getItem('bestScore') || 0;
-let bestTime = localStorage.getItem('bestTime') || 0;
+let bestScore = parseInt(localStorage.getItem('bestScore')) || 0;
+let bestTime = parseInt(localStorage.getItem('bestTime')) || 0;
 
 // Function to update best score and best time in local storage
 function localSave() {
     localStorage.setItem('bestScore', bestScore);
     localStorage.setItem('bestTime', bestTime);
 }
-
 //display startup page
-function displayStartup(){
+function displayStartup() {
     gamepage.style.display = "none";
     startup.style.display = "flex";
-    // bScore.textContent = `Best Score: ${bestScore}`;
-    // bTime.textContent = `Best Time: ${bestTime}`;
-
+    bScore.textContent = `Best Score: ${bestScore}`;
+    if (bestTime !== 0) {
+        const bestMinutes = Math.floor(bestTime / 60);
+        const bestSeconds = bestTime % 60;
+        bTime.textContent = `Best Time: ${bestMinutes}:${bestSeconds < 10 ? '0' : ''}${bestSeconds}`;
+    } else {
+        bTime.textContent = `Best Time: N/A`;
+    }
 }
 // home page
-
-function displayHome(){
+function displayHome() {
     easy.style.display = "none";
     gamepage.style.display = "flex";
     resetGame();
 }
 //countdown display
-
-
-function displayCountdown(){
+function displayCountdown() {
     startup.style.display = "none";
     countdown.style.display = "flex";
     startcountdown();
 }
 
-function displayPlaying(){
+function displayPlaying() {
     countdown.style.display = "none";
     displayEasy();
 }
-
 //play page
 
-function startcountdown(){
-    const count =document.getElementById('count');
+function startcountdown() {
+    const count = document.getElementById('count');
     count.textContent = '3';
     setTimeout(() => {
         count.textContent = '2';
-    },1000);
+    }, 1000);
     setTimeout(() => {
         count.textContent = '1';
-    },2000);
+    }, 2000);
     setTimeout(() => {
         count.textContent = 'Go..!';
-    },3000);
+    }, 3000);
     setTimeout(() => {
-        displayPlaying() ;
-    },3400);
-
+        displayPlaying();
+    }, 3400);
 }
 
-function displayEasy(){   
+function displayEasy() {
     easy.style.display = "block";
     gamepage.style.display = "none";
     startGame();
 }
-///
-
-//////////
-
 
 function generateRandomMathEquation() {
-    // Define operators and operands
     let a = [];
     let b = 0;
     let c = 0;
-    if(flag==0){
+    if (flag == 0) {
         a = ['+', '-'];
         b = Math.floor(Math.random() * 10);
         c = Math.floor(Math.random() * 10);
-    }else if(flag==1){
+    } else if (flag == 1) {
         a = ['+', '-', '*'];
         b = Math.floor(Math.random() * 100);
         c = Math.floor(Math.random() * 100);
-    }else if(flag==2){
-        a = [ '*', '/'];
+    } else if (flag == 2) {
+        a = ['*', '/'];
         b = Math.floor(Math.random() * 100);
         c = Math.floor(Math.random() * 100);
     }
     const operators = a;
     const operand1 = b;
     const operand2 = c;
-    const operator = operators[Math.floor(Math.random() * operators.length)]; // Random operator
-    
+    const operator = operators[Math.floor(Math.random() * operators.length)];
     // Generate the equation
     let equation = `${operand1} ${operator} ${operand2}`;
-
     // Check for division by zero
     if (operator === '/' && operand2 === 0) {
         return generateRandomMathEquation(); // Recursively generate another equation
     }
 
-    // Calculate the result
     let result;
     try {
-        result = eval(equation); // Evaluate the equation
+        result = eval(equation);// Evaluate the equation
     } catch (error) {
         return generateRandomMathEquation(); // Handle any errors by generating another equation
     }
-
     // Return the equation and result as an object
     return {
         equation: equation,
@@ -609,9 +598,9 @@ function generateRandomMathEquation() {
 
 function displayEquation() {
     const equationContainer = document.getElementById('equation-container');
-    const randomEquation = generateRandomMathEquation(); 
+    const randomEquation = generateRandomMathEquation();
     equationContainer.textContent = randomEquation.equation;
-    equationContainer.dataset.result = randomEquation.result; // Store the correct result in the dataset
+    equationContainer.dataset.result = randomEquation.result;// Store the correct result in the dataset
 }
 
 function checkAnswer() {
@@ -624,7 +613,7 @@ function checkAnswer() {
     } else {
         if (userAnswer === correctAnswer) {
             resultMessage.textContent = "Correct!";
-            score += 5;
+            score += 10;
             document.getElementById('score').textContent = score;
             clearInput();
         } else {
@@ -632,29 +621,34 @@ function checkAnswer() {
             clearInput();
         }
         equationCount++;
-        if (equationCount < 20) {
+        if (equationCount < 10) {
             displayEquation();
         } else {
             resultMessage.textContent = "Game Over!";
-            finalMessage.textContent = "Your score: "+score+" time: "+time;
-            if(score>bestScore){
+            finalMessage.textContent = `Your score: ${score} time: ${time}`;
+
+            // Update best score
+            if (score > bestScore) {
                 bestScore = score;
+                localStorage.setItem('bestScore', bestScore);
             }
-            if(display.textContent>bestTime){
-            bestTime = display.textContent;
+
+            // Update best time (convert time to seconds for comparison)
+            const timeInSeconds = minutes * 60 + seconds;
+            if (bestTime === 0 || timeInSeconds < bestTime) {
+                bestTime = timeInSeconds;
+                localStorage.setItem('bestTime', bestTime);
             }
+
             localSave();
             stopTimer();
         }
     }
 }
 
-
 function clearInput() {
     document.getElementById("user-answer").value = "";
 }
-
-
 //timer
 let timer;
 let seconds = 0, minutes = 0;
@@ -672,7 +666,6 @@ function resetTimer() {
     minutes = 0;
     display.textContent = '00:00';
 }
-
 function displayTimer() {
     seconds++;
     if (seconds >= 60) {
@@ -682,10 +675,10 @@ function displayTimer() {
 
     const displaySeconds = seconds < 10 ? '0' + seconds : seconds;
     const displayMinutes = minutes < 10 ? '0' + minutes : minutes;
-   display.textContent =  displayMinutes + ':' + displaySeconds;
+    display.textContent =  displayMinutes + ':' + displaySeconds;
 }
 
-    
+
 </script>
 </body>
 </html>
